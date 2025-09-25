@@ -1,12 +1,14 @@
+#include "utils.hpp"
+
 #define MAP_SIZE 30
 
 typedef enum SnakeDirection {
   UP, DOWN, LEFT, RIGHT
 } SnakeDirection;
 
-typedef struct {
-  unsigned int x;
-  unsigned int y;
+typedef struct Candy {
+  unsigned int x = get_random(1, MAP_SIZE - 1); // to avoid being generated at the snake head
+  unsigned int y = get_random(1, MAP_SIZE - 1);
 } Candy;
 
 typedef struct Snake {
@@ -17,5 +19,4 @@ typedef struct Snake {
   Candy candy;
 } Snake;
 
-void move_head(Snake* snake);
-void new_candy(Snake* snake);
+void snake_update(Snake* snake);

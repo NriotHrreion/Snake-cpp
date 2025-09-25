@@ -5,7 +5,7 @@
 #include "snake.hpp"
 
 #define SNAKE_BODY_PIXEL 24
-#define SNAKE_SPEED 500
+#define SNAKE_SPEED 200
 #define WINDOW_PADDING 10
 #define WINDOW_SIZE MAP_SIZE * SNAKE_BODY_PIXEL + 2 * WINDOW_PADDING
 
@@ -84,13 +84,7 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
   const Uint64 now = SDL_GetTicks();
 
   while((now - as->last_ms) >= SNAKE_SPEED) {
-    // Update snake
-    move_head(snake);
-    if(snake->x == snake->candy.x && snake->y == snake->candy.y) {
-      snake->score++;
-      new_candy(snake);
-    }
-
+    snake_update(snake);
     as->last_ms = now;
   }
 
@@ -110,18 +104,22 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
   candy.w = candy.h = SNAKE_BODY_PIXEL;
   candy.x = snake->candy.x * SNAKE_BODY_PIXEL + WINDOW_PADDING;
   candy.y = snake->candy.y * SNAKE_BODY_PIXEL + WINDOW_PADDING;
-  SDL_SetRenderDrawColor(as->renderer, 128, 0, 0, SDL_ALPHA_OPAQUE);
+  SDL_SetRenderDrawColor(as->renderer, 200, 0, 0, SDL_ALPHA_OPAQUE);
   SDL_RenderFillRect(as->renderer, &candy);
 
-  // Draw body
-  SDL_FRect body;
-  body.w = body.h = SNAKE_BODY_PIXEL;
-  body.x = snake->x * SNAKE_BODY_PIXEL + WINDOW_PADDING;
-  body.y = snake->y * SNAKE_BODY_PIXEL + WINDOW_PADDING;
+  // Draw snake head
+  SDL_FRect head;
+  head.w = head.h = SNAKE_BODY_PIXEL;
+  head.x = snake->x * SNAKE_BODY_PIXEL + WINDOW_PADDING;
+  head.y = snake->y * SNAKE_BODY_PIXEL + WINDOW_PADDING;
   SDL_SetRenderDrawColor(as->renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-  SDL_RenderFillRect(as->renderer, &body);
-  SDL_RenderPresent(as->renderer);
+  SDL_RenderFillRect(as->renderer, &head);
 
+  // Draw snake body
+  SDL_FRect body;
+  
+
+  SDL_RenderPresent(as->renderer);
   return SDL_APP_CONTINUE;
 }
 

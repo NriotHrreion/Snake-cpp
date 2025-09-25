@@ -1,11 +1,8 @@
-#include<ctime>
-#include<random>
+#include <SDL3/SDL.h>
+#include "utils.hpp"
 #include "snake.hpp"
 
-int get_random(int min, int max) {
-  srand(time(nullptr));
-  return (rand() % (max - min + 1)) + min;
-}
+using namespace std;
 
 void move_head(Snake* snake) {
   switch(snake->dir) {
@@ -38,6 +35,14 @@ void move_head(Snake* snake) {
 }
 
 void new_candy(Snake* snake) {
-  snake->candy.x = get_random(0, 39);
-  snake->candy.y = get_random(0, 39);
+  snake->candy.x = get_random(0, MAP_SIZE - 1);
+  snake->candy.y = get_random(0, MAP_SIZE - 1);
+}
+
+void snake_update(Snake* snake) {
+  move_head(snake);
+  if(snake->x == snake->candy.x && snake->y == snake->candy.y) {
+    snake->score++;
+    new_candy(snake);
+  }
 }
