@@ -16,6 +16,10 @@ typedef struct {
   Uint64 last_ms;
 } AppState;
 
+int point_to_coord(const int point_num) {
+  return point_num * SNAKE_BODY_PIXEL + WINDOW_PADDING;
+}
+
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
   SDL_Log("Starting snake-cpp...");
   SDL_SetAppMetadata("Snake C++", "0.1.0", "net.nocpiun.snake-cpp");
@@ -83,6 +87,11 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
   Snake* snake = &as->snake;
   const Uint64 now = SDL_GetTicks();
 
+  if(!snake->is_alive) {
+    SDL_SetWindowTitle(as->window, "Snake C++ - You Died!");
+    return SDL_APP_CONTINUE;
+  }
+
   while((now - as->last_ms) >= SNAKE_SPEED) {
     snake_update(snake);
     as->last_ms = now;
@@ -102,22 +111,28 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
   // Draw candy
   SDL_FRect candy;
   candy.w = candy.h = SNAKE_BODY_PIXEL;
-  candy.x = snake->candy.x * SNAKE_BODY_PIXEL + WINDOW_PADDING;
-  candy.y = snake->candy.y * SNAKE_BODY_PIXEL + WINDOW_PADDING;
+  candy.x = point_to_coord(snake->candy.x);
+  candy.y = point_to_coord(snake->candy.y);
   SDL_SetRenderDrawColor(as->renderer, 200, 0, 0, SDL_ALPHA_OPAQUE);
   SDL_RenderFillRect(as->renderer, &candy);
 
   // Draw snake head
   SDL_FRect head;
   head.w = head.h = SNAKE_BODY_PIXEL;
-  head.x = snake->x * SNAKE_BODY_PIXEL + WINDOW_PADDING;
-  head.y = snake->y * SNAKE_BODY_PIXEL + WINDOW_PADDING;
-  SDL_SetRenderDrawColor(as->renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+  head.x = point_to_coord(snake->head.x);
+  head.y = point_to_coord(snake->head.y);
+  SDL_SetRenderDrawColor(as->renderer, 0, 200, 0, SDL_ALPHA_OPAQUE);
   SDL_RenderFillRect(as->renderer, &head);
 
   // Draw snake body
   SDL_FRect body;
-  
+  body.w = body.h = SNAKE_BODY_PIXEL;
+  SDL_SetRenderDrawColor(as->renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+  for(Point bp : snake->body) {
+    body.x = point_to_coord(bp.x);
+    body.y = point_to_coord(bp.y);
+    SDL_RenderFillRect(as->renderer, &body);
+  }
 
   SDL_RenderPresent(as->renderer);
   return SDL_APP_CONTINUE;

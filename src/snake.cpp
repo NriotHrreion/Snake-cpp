@@ -1,37 +1,64 @@
+#include <vector>
 #include <SDL3/SDL.h>
 #include "utils.hpp"
 #include "snake.hpp"
 
 using namespace std;
 
+Point last_point = { -1, -1 };
+
 void move_head(Snake* snake) {
+  last_point = snake->head;
+
   switch(snake->dir) {
     case UP:
-      snake->y--;
+      snake->head.y--;
       break;
     case DOWN:
-      snake->y++;
+      snake->head.y++;
       break;
     case LEFT:
-      snake->x--;
+      snake->head.x--;
       break;
     case RIGHT:
-      snake->x++;
+      snake->head.x++;
       break;
   }
 
-  if(snake->x < 0) {
-    snake->x = MAP_SIZE - 1;
+  // Go through the border
+  if(snake->head.x < 0) {
+    snake->head.x = MAP_SIZE - 1;
   }
-  if(snake->x >= MAP_SIZE) {
-    snake->x = 0;
+  if(snake->head.x >= MAP_SIZE) {
+    snake->head.x = 0;
   }
-  if(snake->y < 0) {
-    snake->y = MAP_SIZE - 1;
+  if(snake->head.y < 0) {
+    snake->head.y = MAP_SIZE - 1;
   }
-  if(snake->y >= MAP_SIZE) {
-    snake->y = 0;
+  if(snake->head.y >= MAP_SIZE) {
+    snake->head.y = 0;
   }
+
+  // No eating self
+  for(Point bp : snake->body) {
+    if(snake->head.x == bp.x && snake->head.y == bp.y) {
+      SDL_Log("You died");
+      snake->is_alive = false;
+      break;
+    }
+  }
+}
+
+void move_body(Snake* snake) {
+  std::vector<Point>* body = &snake->body;
+  for(size_t i = 0; i < body->size(); i++) {
+    Point* bp = &(*body)[i];
+    Point temp = *bp;
+    (*bp).x = last_point.x;
+    (*bp).y = last_point.y;
+    last_point = temp;
+  }
+  last_point = { -1, -1 };
 }
 
 void new_candy(Snake* snake) {
@@ -40,9 +67,15 @@ void new_candy(Snake* snake) {
 }
 
 void snake_update(Snake* snake) {
+  if(!snake->is_alive) return;
+  std::vector<Point>* body = &snake->body;
+
   move_head(snake);
-  if(snake->x == snake->candy.x && snake->y == snake->candy.y) {
+  move_body(snake);
+
+  if(snake->head.x == snake->candy.x && snake->head.y == snake->candy.y) {
     snake->score++;
+    snake->body.emplace_back(body->back()); // ...this will crash the game
     new_candy(snake);
   }
 }
