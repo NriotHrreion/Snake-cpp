@@ -41,12 +41,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
     SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
     return SDL_APP_FAILURE;
   }
-
-  AppState* as = (AppState*) SDL_calloc(1, sizeof(AppState));
-  if(!as) {
-    SDL_Log("AppState is null");
-    return SDL_APP_FAILURE;
-  }
+  AppState* as = new AppState;
   *appstate = as;
 
   if(!SDL_CreateWindowAndRenderer(
