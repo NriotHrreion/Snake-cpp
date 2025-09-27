@@ -1,0 +1,13 @@
+{
+  "configurations": [
+    {
+      "name": "Snake C++",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/Debug/snake-cpp.exe",
+      "args": [],
+      "cwd": "${fileDirname}",
+      "console": "integratedTerminal"
+    }
+  ]
+}
